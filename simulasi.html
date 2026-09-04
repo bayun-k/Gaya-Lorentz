@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simulasi Interaktif Kaidah Tangan Kanan 3D</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Three.js Library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <!-- OrbitControls -->
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+    body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    #canvas-container { width: 100%; height: 100%; min-height: 400px; }
+  </style>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col selection:bg-indigo-500 selection:text-white">
+
+  <!-- Header / Navigation -->
+  <header class="bg-slate-800/80 backdrop-blur border-b border-slate-700/80 sticky top-0 z-30 px-4 py-3 sm:px-6 flex items-center justify-between">
+    <div class="flex items-center space-x-3">
+      <div class="p-2 bg-indigo-600 rounded-lg text-white shadow-lg">
+        <i class="fa-solid fa-hand-sparkles text-xl"></i>
+      </div>
+      <div>
+        <h1 class="text-lg font-bold text-white leading-tight">Simulasi Kaidah Tangan Kanan 3D</h1>
+        <p class="text-xs text-slate-400">Eksperimen Interaktif Gaya Lorentz</p>
+      </div>
+    </div>
+    <div class="flex items-center space-x-2">
+      <button onclick="toggleMode('sim')" id="btnSim" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-indigo-600 text-white transition">
+        <i class="fa-solid fa-cube mr-1"></i> Mode Eksperimen
+      </button>
+      <button onclick="toggleMode('quiz')" id="btnQuiz" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-slate-700 hover:bg-slate-600 text-slate-300 transition">
+        <i class="fa-solid fa-graduation-cap mr-1"></i> Mode Kuis
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Content Layout -->
+  <div class="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-0">
+    
+    <!-- Left / Controls Panel (Simulasi) -->
+    <div id="simPanel" class="lg:col-span-4 p-5 bg-slate-800/50 border-r border-slate-700/80 flex flex-col justify-between space-y-6 overflow-y-auto">
+      <div class="space-y-6">
+        <div>
+          <h2 class="text-sm font-bold text-slate-300 uppercase tracking-wider mb-1">
+            <i class="fa-solid fa-sliders text-indigo-400 mr-2"></i> Pengaturan Vektor & Arah
+          </h2>
+          <p class="text-xs text-slate-400">Atur arah Arus ($I$) dan Medan Magnet ($B$) untuk mengamati arah Gaya Lorentz ($F$).</p>
+        </div>
+
+        <!-- Jenis Partikel / Kasus -->
+        <div class="bg-slate-800 p-3.5 rounded-xl border border-slate-700">
+          <label class="block text-xs font-semibold text-slate-300 mb-2">Jenis Muatan / Penghantar</label>
+          <div class="grid grid-cols-2 gap-2">
+            <button onclick="setCharge('positive')" id="btnPos" class="py-2 px-3 text-xs font-semibold rounded-lg bg-indigo-600 text-white border border-indigo-500">
+              <i class="fa-solid fa-plus-circle mr-1"></i> Positif / Arus (I)
+            </button>
+            <button onclick="setCharge('negative')" id="btnNeg" class="py-2 px-3 text-xs font-semibold rounded-lg bg-slate-700 text-slate-300 border border-slate-600">
+              <i class="fa-solid fa-minus-circle mr-1"></i> Negatif (Elektron)
+            </button>
+          </div>
+        </div>
+
+        <!-- Selector Arah Arus / Kecepatan -->
+        <div class="bg-slate-800 p-3.5 rounded-xl border border-slate-700">
+          <label class="block text-xs font-semibold text-red-400 mb-2 flex items-center justify-between">
+            <span><i class="fa-solid fa-arrow-right mr-1.5"></i> Arah Arus Listrik (I) / Kecepatan (v)</span>
+            <span class="text-[10px] bg-red-950/80 text-red-300 px-2 py-0.5 rounded border border-red-800">Ibu Jari</span>
+          </label>
+          <select id="selectI" onchange="updateVectors()" class="w-full bg-slate-900 border border-slate-700 text-slate-200 text-xs rounded-lg p-2.5 focus:border-red-500 focus:outline-none">
+            <option value="+X">Sumbu +X (Kanan)</option>
+            <option value="-X">Sumbu -X (Kiri)</option>
+            <option value="+Y" selected>Sumbu +Y (Atas)</option>
+            <option value="-Y">Sumbu -Y (Bawah)</option>
+            <option value="+Z">Sumbu +Z (Keluar Bidang / Mendekat)</option>
+            <option value="-Z">Sumbu -Z (Masuk Bidang / Menjauh)</option>
+          </select>
+        </div>
+
+        <!-- Selector Arah Medan Magnet -->
+        <div class="bg-slate-800 p-3.5 rounded-xl border border-slate-700">
+          <label class="block text-xs font-semibold text-emerald-400 mb-2 flex items-center justify-between">
+            <span><i class="fa-solid fa-magnet mr-1.5"></i> Arah Medan Magnet (B)</span>
+            <span class="text-[10px] bg-emerald-950/80 text-emerald-300 px-2 py-0.5 rounded border border-emerald-800">Jari Telunjuk</span>
+          </label>
+          <select id="selectB" onchange="updateVectors()" class="w-full bg-slate-900 border border-slate-700 text-slate-200 text-xs rounded-lg p-2.5 focus:border-emerald-500 focus:outline-none">
+            <option value="+X" selected>Sumbu +X (Kanan)</option>
+            <option value="-X">Sumbu -X (Kiri)</option>
+            <option value="+Y">Sumbu +Y (Atas)</option>
+            <option value="-Y">Sumbu -Y (Bawah)</option>
+            <option value="+Z">Sumbu +Z (Keluar Bidang / Mendekat)</option>
+            <option value="-Z">Sumbu -Z (Masuk Bidang / Menjauh)</option>
+          </select>
+        </div>
+
+        <!-- Ringkasan Hasil Gaya -->
+        <div class="p-4 bg-indigo-950/50 border border-indigo-500/30 rounded-xl space-y-2">
+          <div class="text-xs text-indigo-300 font-medium flex items-center justify-between">
+            <span>Hasil Arah Gaya Lorentz (F):</span>
+            <span class="text-[10px] bg-indigo-900 text-indigo-200 px-2 py-0.5 rounded">Telapak / Jari Tengah</span>
+          </div>
+          <div id="resultDirText" class="text-base font-extrabold text-blue-400 flex items-center space-x-2">
+            <i class="fa-solid fa-compass"></i>
+            <span>Sumbu -Z (Masuk Bidang)</span>
+          </div>
+          <p id="resultDesc" class="text-[11px] text-slate-400 leading-relaxed pt-1">
+            Gaya berarah tegak lurus terhadap bidang yang dibentuk oleh vektor Arus ($I$) dan Medan Magnet ($B$).
+          </p>
+        </div>
+      </div>
+
+      <!-- Legend & Petunjuk Rotasi Canvas -->
+      <div class="p-3 bg-slate-900/60 rounded-lg border border-slate-800 text-[11px] text-slate-400 flex items-center justify-between">
+        <span><i class="fa-solid fa-arrows-spin text-indigo-400 mr-1"></i> Klik & seret mouse pada canvas untuk memutar sudut pandang 3D</span>
+      </div>
+    </div>
+
+    <!-- Mode Kuis Panel (Hidden by default) -->
+    <div id="quizPanel" class="hidden lg:col-span-4 p-5 bg-slate-800/50 border-r border-slate-700/80 flex flex-col justify-between space-y-6 overflow-y-auto">
+      <div class="space-y-5">
+        <div>
+          <h2 class="text-sm font-bold text-slate-300 uppercase tracking-wider mb-1">
+            <i class="fa-solid fa-circle-question text-amber-400 mr-2"></i> Kuis Uji Pemahaman
+          </h2>
+          <p class="text-xs text-slate-400">Tebak arah Gaya Lorentz berdasarkan kondisi di bawah ini!</p>
+        </div>
+
+        <div class="p-4 bg-slate-800 border border-slate-700 rounded-xl space-y-3">
+          <div class="flex items-center justify-between">
+            <span class="text-xs text-slate-400">Skor Anda:</span>
+            <span id="quizScore" class="text-sm font-bold text-amber-400">0</span>
+          </div>
+          <div class="p-3 bg-slate-900 rounded-lg space-y-2 text-xs">
+            <div class="flex justify-between">
+              <span class="text-slate-400">Jenis Muatan:</span>
+              <span id="quizCharge" class="font-bold text-indigo-400">Positif / Arus</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-slate-400">Arah Arus ($I$ / $v$):</span>
+              <span id="quizI" class="font-bold text-red-400">Sumbu +X (Kanan)</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-slate-400">Arah Medan ($B$):</span>
+              <span id="quizB" class="font-bold text-emerald-400">Sumbu +Y (Atas)</span>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-2">Pilih Arah Gaya Lorentz ($F$):</label>
+          <div class="grid grid-cols-2 gap-2" id="quizOptions">
+            <!-- Dynamic quiz buttons generated by JS -->
+          </div>
+        </div>
+
+        <div id="quizFeedback" class="hidden p-3 rounded-lg text-xs font-semibold text-center"></div>
+      </div>
+
+      <button onclick="nextQuizQuestion()" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-lg transition shadow">
+        Soal Berikutnya <i class="fa-solid fa-arrow-right ml-1"></i>
+      </button>
+    </div>
+
+    <!-- Right / 3D Canvas Viewport -->
+    <div class="lg:col-span-8 relative bg-slate-950 flex flex-col justify-center items-center min-h-[450px]">
+      
+      <!-- Overlay Floating Controls/Info -->
+      <div class="absolute top-4 left-4 z-10 flex flex-wrap gap-2">
+        <span class="bg-red-500/20 text-red-300 border border-red-500/40 text-[11px] font-bold px-2.5 py-1 rounded-full flex items-center">
+          <span class="w-2 h-2 rounded-full bg-red-500 mr-1.5"></span> Vektor I / v (Red)
+        </span>
+        <span class="bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 text-[11px] font-bold px-2.5 py-1 rounded-full flex items-center">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 mr-1.5"></span> Vektor B (Green)
+        </span>
+        <span class="bg-blue-500/20 text-blue-300 border border-blue-500/40 text-[11px] font-bold px-2.5 py-1 rounded-full flex items-center">
+          <span class="w-2 h-2 rounded-full bg-blue-500 mr-1.5"></span> Vektor F (Blue)
+        </span>
+      </div>
+
+      <div class="absolute bottom-4 right-4 z-10">
+        <button onclick="resetCamera()" class="p-2.5 bg-slate-800/80 hover:bg-slate-700 text-slate-300 rounded-lg text-xs border border-slate-700 backdrop-blur shadow">
+          <i class="fa-solid fa-video mr-1"></i> Reset Kamera
+        </button>
+      </div>
+
+      <!-- 3D Container -->
+      <div id="canvas-container"></div>
+    </div>
+
+  </div>
+
+  <script>
+    // --- STATE VARIABLES ---
+    let isPositive = true;
+    let currentMode = 'sim';
+    let quizScore = 0;
+    let currentQuizAnswer = '';
+
+    // --- THREE.JS GLOBALS ---
+    let scene, camera, renderer, controls;
+    let arrowI, arrowB, arrowF;
+    let handGroup;
+
+    // Axis mapping dictionary (Key -> Vector3)
+    const axisVectors = {
+      '+X': new THREE.Vector3(1, 0, 0),
+      '-X': new THREE.Vector3(-1, 0, 0),
+      '+Y': new THREE.Vector3(0, 1, 0),
+      '-Y': new THREE.Vector3(0, -1, 0),
+      '+Z': new THREE.Vector3(0, 0, 1),
+      '-Z': new THREE.Vector3(0, 0, -1)
+    };
+
+    const axisDescriptions = {
+      '+X': 'Sumbu +X (Kanan)',
+      '-X': 'Sumbu -X (Kiri)',
+      '+Y': 'Sumbu +Y (Atas)',
+      '-Y': 'Sumbu -Y (Bawah)',
+      '+Z': 'Sumbu +Z (Keluar Bidang / Mendekat)',
+      '-Z': 'Sumbu -Z (Masuk Bidang / Menjauh)'
+    };
+
+    // --- INITIALIZATION ---
+    window.onload = function() {
+      init3D();
+      updateVectors();
+      generateQuizOptions();
+      nextQuizQuestion();
+    };
+
+    function init3D() {
+      const container = document.getElementById('canvas-container');
+      const width = container.clientWidth;
+      const height = container.clientHeight;
+
+      // 1. Scene
+      scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x020617); // Slate-950
+
+      // 2. Camera
+      camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
+      camera.position.set(4, 3, 5);
+
+      // 3. Renderer
+      renderer = new THREE.WebGLRenderer({ antialias: true });
+      renderer.setSize(width, height);
+      renderer.setPixelRatio(window.devicePixelRatio);
+      container.appendChild(renderer.domElement);
+
+      // 4. Controls
+      controls = new THREE.OrbitControls(camera, renderer.domElement);
+      controls.enableDamping = true;
+      controls.dampingFactor = 0.05;
+
+      // 5. Lights
+      const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
+      scene.add(ambientLight);
+
+      const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
+      dirLight.position.set(5, 10, 7);
+      scene.add(dirLight);
+
+      // 6. Helpers (Grid & Center Sphere)
+      const gridHelper = new THREE.GridHelper(6, 12, 0x334155, 0x1e293b);
+      gridHelper.position.y = -1.5;
+      scene.add(gridHelper);
+
+      // Sphere representing particle charge at origin
+      const chargeGeo = new THREE.SphereGeometry(0.25, 32, 32);
+      const chargeMat = new THREE.MeshStandardMaterial({ color: 0x6366f1, roughness: 0.3 });
+      const chargeMesh = new THREE.Mesh(chargeGeo, chargeMat);
+      scene.add(chargeMesh);
+
+      // 7. Arrow Helper Vectors
+      const origin = new THREE.Vector3(0, 0, 0);
+      const length = 1.8;
+
+      // Arrow I (Red)
+      arrowI = new THREE.ArrowHelper(axisVectors['+Y'], origin, length, 0xef4444, 0.3, 0.15);
+      scene.add(arrowI);
+
+      // Arrow B (Green)
+      arrowB = new THREE.ArrowHelper(axisVectors['+X'], origin, length, 0x10b981, 0.3, 0.15);
+      scene.add(arrowB);
+
+      // Arrow F (Blue)
+      arrowF = new THREE.ArrowHelper(axisVectors['-Z'], origin, length, 0x3b82f6, 0.3, 0.15);
+      scene.add(arrowF);
+
+      // Window Resize Listener
+      window.addEventListener('resize', onWindowResize);
+
+      // Animation Loop
+      animate();
+    }
+
+    function animate() {
+      requestAnimationFrame(animate);
+      controls.update();
+      renderer.render(scene, camera);
+    }
+
+    function onWindowResize() {
+      const container = document.getElementById('canvas-container');
+      if (!container) return;
+      camera.aspect = container.clientWidth / container.clientHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(container.clientWidth, container.clientHeight);
+    }
+
+    function resetCamera() {
+      camera.position.set(4, 3, 5);
+      controls.target.set(0, 0, 0);
+      controls.update();
+    }
+
+    // --- LOGIC CALCULATIONS ---
+    function setCharge(type) {
+      isPositive = (type === 'positive');
+      
+      const btnPos = document.getElementById('btnPos');
+      const btnNeg = document.getElementById('btnNeg');
+
+      if (isPositive) {
+        btnPos.className = "py-2 px-3 text-xs font-semibold rounded-lg bg-indigo-600 text-white border border-indigo-500";
+        btnNeg.className = "py-2 px-3 text-xs font-semibold rounded-lg bg-slate-700 text-slate-300 border border-slate-600";
+      } else {
+        btnNeg.className = "py-2 px-3 text-xs font-semibold rounded-lg bg-indigo-600 text-white border border-indigo-500";
+        btnPos.className = "py-2 px-3 text-xs font-semibold rounded-lg bg-slate-700 text-slate-300 border border-slate-600";
+      }
+
+      updateVectors();
+    }
+
+    function updateVectors() {
+      const dirIStr = document.getElementById('selectI').value;
+      const dirBStr = document.getElementById('selectB').value;
+
+      const vecI = axisVectors[dirIStr];
+      const vecB = axisVectors[dirBStr];
+
+      // Calculate Cross Product: F = I x B (or q*(v x B))
+      let vecF = new THREE.Vector3().crossVectors(vecI, vecB);
+
+      // If negative charge, reverse direction
+      if (!isPositive) {
+        vecF.negate();
+      }
+
+      // Update 3D Arrow Directions
+      arrowI.setDirection(vecI);
+      arrowB.setDirection(vecB);
+
+      const resultTextEl = document.getElementById('resultDirText');
+      const resultDescEl = document.getElementById('resultDesc');
+
+      if (vecF.lengthSq() === 0) {
+        // Parallel vectors -> F = 0
+        arrowF.visible = false;
+        resultTextEl.innerHTML = `<span class="text-amber-400"><i class="fa-solid fa-ban"></i> F = 0 (Tidak Ada Gaya)</span>`;
+        resultDescEl.innerText = "Karena arah Arus (I) dan Medan Magnet (B) sejajar (0° atau 180°), tidak ada gaya Lorentz yang dihasilkan.";
+      } else {
+        arrowF.visible = true;
+        arrowF.setDirection(vecF.clone().normalize());
+
+        // Find string representation of vecF
+        let fStr = Object.keys(axisVectors).find(key => axisVectors[key].equals(vecF));
+        resultTextEl.innerHTML = `<i class="fa-solid fa-compass"></i> <span>${axisDescriptions[fStr]}</span>`;
+        
+        if (isPositive) {
+          resultDescEl.innerText = "Arah gaya Lorentz dihitung menggunakan aturan perkalian silang (Cross Product) Kaidah Tangan Kanan.";
+        } else {
+          resultDescEl.innerText = "Karena muatan bernilai negatif (elektron), arah gaya Lorentz berlawanan dengan hasil Kaidah Tangan Kanan standar.";
+        }
+      }
+    }
+
+    // --- KUIS LOGIC ---
+    function toggleMode(mode) {
+      currentMode = mode;
+      const simPanel = document.getElementById('simPanel');
+      const quizPanel = document.getElementById('quizPanel');
+      const btnSim = document.getElementById('btnSim');
+      const btnQuiz = document.getElementById('btnQuiz');
+
+      if (mode === 'sim') {
+        simPanel.classList.remove('hidden');
+        quizPanel.classList.add('hidden');
+        btnSim.className = "px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-indigo-600 text-white transition";
+        btnQuiz.className = "px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-slate-700 hover:bg-slate-600 text-slate-300 transition";
+        updateVectors();
+      } else {
+        simPanel.classList.add('hidden');
+        quizPanel.classList.remove('hidden');
+        btnQuiz.className = "px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-indigo-600 text-white transition";
+        btnSim.className = "px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-slate-700 hover:bg-slate-600 text-slate-300 transition";
+      }
+    }
+
+    function generateQuizOptions() {
+      const container = document.getElementById('quizOptions');
+      container.innerHTML = '';
+      
+      const keys = ['+X', '-X', '+Y', '-Y', '+Z', '-Z', '0'];
+      const labels = {
+        '+X': '+X (Kanan)',
+        '-X': '-X (Kiri)',
+        '+Y': '+Y (Atas)',
+        '-Y': '-Y (Bawah)',
+        '+Z': '+Z (Mendekat)',
+        '-Z': '-Z (Menjauh)',
+        '0': 'F = 0 (Nol)'
+      };
+
+      keys.forEach(k => {
+        const btn = document.createElement('button');
+        btn.onclick = () => checkQuizAnswer(k);
+        btn.className = "p-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-lg text-xs font-medium text-slate-200 transition text-left";
+        btn.innerText = labels[k];
+        container.appendChild(btn);
+      });
+    }
+
+    function nextQuizQuestion() {
+      const feedback = document.getElementById('quizFeedback');
+      feedback.classList.add('hidden');
+
+      const keys = ['+X', '-X', '+Y', '-Y', '+Z', '-Z'];
+      const randomIKey = keys[Math.floor(Math.random() * keys.length)];
+      let randomBKey = keys[Math.floor(Math.random() * keys.length)];
+      const qIsPositive = Math.random() > 0.3; // 70% positive, 30% negative
+
+      document.getElementById('quizCharge').innerText = qIsPositive ? "Positif / Arus" : "Negatif (Elektron)";
+      document.getElementById('quizI').innerText = axisDescriptions[randomIKey];
+      document.getElementById('quizB').innerText = axisDescriptions[randomBKey];
+
+      // Calculate correct F answer
+      const vecI = axisVectors[randomIKey];
+      const vecB = axisVectors[randomBKey];
+      let vecF = new THREE.Vector3().crossVectors(vecI, vecB);
+      if (!qIsPositive) vecF.negate();
+
+      if (vecF.lengthSq() === 0) {
+        currentQuizAnswer = '0';
+      } else {
+        currentQuizAnswer = Object.keys(axisVectors).find(k => axisVectors[k].equals(vecF));
+      }
+
+      // Sync 3D view to quiz question
+      isPositive = qIsPositive;
+      document.getElementById('selectI').value = randomIKey;
+      document.getElementById('selectB').value = randomBKey;
+      updateVectors();
+    }
+
+    function checkQuizAnswer(selectedKey) {
+      const feedback = document.getElementById('quizFeedback');
+      feedback.classList.remove('hidden');
+
+      if (selectedKey === currentQuizAnswer) {
+        quizScore += 10;
+        document.getElementById('quizScore').innerText = quizScore;
+        feedback.className = "p-3 bg-emerald-900/80 border border-emerald-600 rounded-lg text-xs font-semibold text-emerald-200 text-center";
+        feedback.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-400 mr-1"></i> Benar Sekali! (+10 Poin)`;
+      } else {
+        feedback.className = "p-3 bg-rose-900/80 border border-rose-600 rounded-lg text-xs font-semibold text-rose-200 text-center";
+        feedback.innerHTML = `<i class="fa-solid fa-circle-xmark text-rose-400 mr-1"></i> Kurang Tepat. Jawaban benar adalah: <strong>${currentQuizAnswer === '0' ? 'F = 0' : currentQuizAnswer}</strong>`;
+      }
+    }
+  </script>
+</body>
+</html>
