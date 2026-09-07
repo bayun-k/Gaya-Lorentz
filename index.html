@@ -12,6 +12,14 @@
       font-family: 'Plus Jakarta Sans', sans-serif;
     }
   </style>
+  <script>
+MathJax = {
+  tex: {
+    inlineMath: [['$', '$'], ['\\(', '\\)']]
+  }
+};
+</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 </head>
 <body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col selection:bg-indigo-500 selection:text-white antialiased">
 
@@ -39,7 +47,7 @@
             <i class="fa-solid fa-book-open mr-1.5"></i> 1. Materi
           </button>
           <button onclick="switchTab('lkpd')" id="nav-lkpd" class="nav-btn px-4 py-2 rounded-lg text-sm font-semibold text-slate-300 hover:text-white hover:bg-slate-700/50 transition">
-            <i class="fa-solid fa-file-pen mr-1.5"></i> 2. LKPD
+            <i class="fa-solid fa-file-pen mr-1.5"></i> 2. Latihan Soal
           </button>
           <button onclick="switchTab('simulasi')" id="nav-simulasi" class="nav-btn px-4 py-2 rounded-lg text-sm font-semibold text-slate-300 hover:text-white hover:bg-slate-700/50 transition">
             <i class="fa-solid fa-cube mr-1.5"></i> 3. Simulasi 3D
@@ -64,7 +72,7 @@
         <i class="fa-solid fa-book-open mr-2"></i> 1. Materi
       </button>
       <button onclick="switchTab('lkpd'); toggleMobileMenu()" class="w-full text-left px-3 py-2 rounded-lg text-sm font-semibold text-slate-300 hover:bg-slate-700">
-        <i class="fa-solid fa-file-pen mr-2"></i> 2. LKPD
+        <i class="fa-solid fa-file-pen mr-2"></i> 2. Latihan Soal
       </button>
       <button onclick="switchTab('simulasi'); toggleMobileMenu()" class="w-full text-left px-3 py-2 rounded-lg text-sm font-semibold text-slate-300 hover:bg-slate-700">
         <i class="fa-solid fa-cube mr-2"></i> 3. Simulasi 3D
@@ -128,13 +136,13 @@
               <i class="fa-solid fa-file-signature"></i>
             </div>
             <span class="text-xs font-bold uppercase tracking-wider text-emerald-400">Menu 2</span>
-            <h3 class="text-xl font-bold text-white mt-1 mb-2 group-hover:text-emerald-300 transition">LKPD Interaktif</h3>
+            <h3 class="text-xl font-bold text-white mt-1 mb-2 group-hover:text-emerald-300 transition">Latihan Soal</h3>
             <p class="text-sm text-slate-400 leading-relaxed">
-              Lembar Kerja Peserta Didik berbasis investigasi mandiri dan kelompok yang terintegrasi dengan perangkat simulasi.
+              Latihan Soal Peserta Didik berbasis investigasi mandiri dan kelompok yang terintegrasi dengan perangkat simulasi.
             </p>
           </div>
           <div class="mt-6 pt-4 border-t border-slate-700/60 flex items-center justify-between text-xs font-semibold text-emerald-400 group-hover:text-emerald-300">
-            <span>Kerjakan LKPD</span>
+            <span>Latihan Soal</span>
             <i class="fa-solid fa-arrow-right transition group-hover:translate-x-1"></i>
           </div>
         </div>
@@ -188,10 +196,10 @@
           <i class="fa-solid fa-square-root-variable mr-2 text-indigo-400"></i> 2. Formulasi Matematis
         </h3>
         
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
           <!-- Kawat Berarus -->
           <div class="p-5 bg-slate-900/80 border border-slate-700 rounded-xl space-y-2">
-            <span class="text-xs font-bold text-indigo-400 uppercase tracking-wider block">Kawat Lurus Berarus</span>
+            <span class="text-xs font-bold text-blue-400 uppercase tracking-wider block">Kawat Lurus Berarus</span>
             <div class="text-center py-3 bg-slate-800 rounded-lg border border-slate-700">
               <span class="text-xl font-bold text-white">F = B · I · L · sin(θ)</span>
             </div>
@@ -201,6 +209,43 @@
               <li><strong>I:</strong> Kuat Arus Listrik (Ampere / A)</li>
               <li><strong>L:</strong> Panjang Kawat (Meter / m)</li>
               <li><strong>θ:</strong> Sudut antara arah I dan B</li>
+            </ul>
+          </div>
+
+          <!-- Kawat Sejajar -->
+          <div class="p-5 bg-slate-900/80 border border-slate-700 rounded-xl space-y-2">
+            <span class="text-xs font-bold text-blue-400 uppercase tracking-wider block">Kawat Sejajar</span>
+            <div class="text-center py-3 bg-slate-800 rounded-lg border border-slate-700">
+              <span class="text-xl font-bold text-white">
+                <p>
+                    \[
+                    F = \frac{\mu_0 I_1 I_2}{2\pi a}\ell
+                    \]
+                </p>
+              </span>
+            </div>
+            <ul class="text-xs text-slate-300 space-y-1">
+              <li>
+                    \(F\) = gaya magnet antara kedua kawat (N)
+                </li>
+                <li>
+                    \(\mu_0\) = permeabilitas vakum
+                    \[
+                    \mu_0 = 4\pi \times 10^{-7}\ \text{N/A}^2
+                    \]
+                </li>
+                <li>
+                    \(I_1\) = kuat arus listrik pada kawat pertama (A)
+                </li>
+                <li>
+                    \(I_2\) = kuat arus listrik pada kawat kedua (A)
+                </li>
+                <li>
+                    \(a\) = jarak antara kedua kawat (m)
+                </li>
+                <li>
+                    \(\ell\) = panjang kawat yang ditinjau (m)
+                </li>
             </ul>
           </div>
 
@@ -245,6 +290,60 @@
           <i class="fa-solid fa-circle-play mr-2 text-indigo-400"></i> 4. Video Pembelajaran Interaktif
         </h3>
         <p class="text-slate-300 text-sm leading-relaxed">
+          Saksikan video terkait Gaya Lorentz pada Kawat Sejajar dan Muatan Bergerak:
+        </p>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
+          <!-- Video Card 1 -->
+          <div class="bg-slate-900/90 border border-slate-700/80 rounded-xl overflow-hidden shadow-lg flex flex-col">
+            <div class="relative w-full aspect-video bg-black">
+              <iframe 
+                class="absolute inset-0 w-full h-full" 
+                src="https://www.youtube.com/embed/T--zn3HeVMY" 
+                title="Gaya Lorentz pada Kawat Sejajar" 
+                frameborder="0" 
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                allowfullscreen>
+              </iframe>
+            </div>
+            <div class="p-4 flex-1 flex flex-col justify-between">
+              <div>
+                <span class="text-[10px] uppercase tracking-wider font-bold text-indigo-400 bg-indigo-950 px-2 py-0.5 rounded border border-indigo-800">Gaya Lorentz pada Kawat Sejajar</span>
+                <h4 class="text-sm font-bold text-white mt-1.5 leading-snug">Panduan Menentukan Besar Gaya Lorentz pada Kawat Lurus/Sejajar</h4>
+              </div>
+              <div class="mt-3 pt-3 border-t border-slate-800 flex items-center justify-between text-[11px] text-slate-400">
+                <span><i class="fa-solid fa-user-gear mr-1"></i> Justin Leonardo</span>
+                <a href="https://www.youtube.com/watch?v=T--zn3HeVMY" target="_blank" rel="noopener noreferrer" class="text-indigo-400 hover:text-indigo-300 font-semibold">Tonton di YouTube <i class="fa-solid fa-arrow-up-right-from-square ml-0.5"></i></a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Video Card 2 -->
+          <div class="bg-slate-900/90 border border-slate-700/80 rounded-xl overflow-hidden shadow-lg flex flex-col">
+            <div class="relative w-full aspect-video bg-black">
+              <iframe 
+                class="absolute inset-0 w-full h-full" 
+                src="https://www.youtube.com/embed/J9MKemP-6Qw?si" 
+                title="Menentukan Arah Gaya Lorentz Pada Sebuah Soal" 
+                frameborder="0" 
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                allowfullscreen>
+              </iframe>
+            </div>
+            <div class="p-4 flex-1 flex flex-col justify-between">
+              <div>
+                <span class="text-[10px] uppercase tracking-wider font-bold text-emerald-400 bg-emerald-950 px-2 py-0.5 rounded border border-emerald-800">Gaya Lorentz pada Muatan Bergerak</span>
+                <h4 class="text-sm font-bold text-white mt-1.5 leading-snug">Panduan Menentukan Besar Gaya Lorentz pada Muatan Bergerak</h4>
+              </div>
+              <div class="mt-3 pt-3 border-t border-slate-800 flex items-center justify-between text-[11px] text-slate-400">
+                <span><i class="fa-solid fa-user-gear mr-1"></i> Justin Leonardo</span>
+                <a href="https://www.youtube.com/watch?v=J9MKemP-6Qw?si" target="_blank" rel="noopener noreferrer" class="text-emerald-400 hover:text-emerald-300 font-semibold">Tonton di YouTube <i class="fa-solid fa-arrow-up-right-from-square ml-0.5"></i></a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+       <p class="text-slate-300 text-sm leading-relaxed">
           Saksikan video tutorial berikut untuk memvisualisasikan Kaidah Tangan Kanan dan pemecahan contoh soal gaya Lorentz secara langsung:
         </p>
 
@@ -300,7 +399,6 @@
           </div>
         </div>
       </div>
-
       
     </div>
   </div>
@@ -312,11 +410,11 @@
       <!-- Header LKPD -->
       <div class="border-b border-slate-700 pb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <span class="px-3 py-1 bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 rounded-full text-xs font-bold uppercase tracking-wide">Lembar Kerja Siswa</span>
-          <h2 class="text-3xl font-extrabold text-white mt-2">LKPD Interaktif: Gaya Lorentz</h2>
+          <span class="px-3 py-1 bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 rounded-full text-xs font-bold uppercase tracking-wide">Latihan Soal Siswa</span>
+          <h2 class="text-3xl font-extrabold text-white mt-2">Contoh Soal: Gaya Lorentz</h2>
         </div>
         <button onclick="window.print()" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-slate-200 rounded-lg text-xs font-bold transition flex items-center w-fit">
-          <i class="fa-solid fa-print mr-1.5"></i> Cetak LKPD
+          <i class="fa-solid fa-print mr-1.5"></i> Cetak Soal
         </button>
       </div>
 
@@ -365,11 +463,18 @@
 
       <!-- Pertanyaan Analisis -->
       <div class="space-y-4 pt-4 border-t border-slate-700">
-        <h3 class="text-lg font-bold text-emerald-300">Kegiatan 2: Pertanyaan Analisis Konseptual</h3>
+        <h3 class="text-lg font-bold text-emerald-300">Kegiatan 2: Soal Kawat Sejajar</h3>
         
         <div class="space-y-3 text-xs sm:text-sm">
-          <label class="block font-semibold text-slate-200">1. Mengapa arah Gaya Lorentz pada muatan positif berbeda dengan muatan negatif meskipun arah I dan B sama?</label>
-          <textarea rows="3" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-white text-xs focus:outline-none focus:border-emerald-500" placeholder="Tuliskan jawaban analisis Anda di sini..."></textarea>
+          <label class="block font-semibold text-slate-200">1.Dua kawat sejajar yang berjarak 1 m atau sama lain dialiri oleh arus listrik masing-masing 1A dengan arah yang sama. Berapa besar gaya dan apa reaksi yang muncul antar gaya tersebut?</label>
+        </div>
+      </div>
+
+      <div class="space-y-4 pt-4 border-t border-slate-700">
+        <h3 class="text-lg font-bold text-emerald-300">Kegiatan 3: Soal Medan Bergerak</h3>
+        
+        <div class="space-y-3 text-xs sm:text-sm">
+          <label class="block font-semibold text-slate-200">1.Suatu muatan positif dari 0,2 C bergerak dengan kecepatan 2 m/s dalam medan magnetik yang besarnya 5 \( \text{Wb/m}^2 \). Arah kecepatan muatan itu tegak lurus dengan arah medan magnetik. gaya yang dialami muatan tersebut adalah.... </label>
         </div>
       </div>
 
